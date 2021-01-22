@@ -150,17 +150,35 @@ $1809Build = "17763"
 # Get running Windows build
 $windowsBuild = (Get-CimInstance -Class Win32_OperatingSystem).BuildNumber
 # Get information about local WSUS server
+<<<<<<< Updated upstream
 $wuServer = (Get-ItemProperty "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" -Name WUServer -ErrorAction Ignore).WUServer
 $useWUServer = (Get-ItemProperty -Path "HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate\AU" -ErrorAction Ignore).UseWuServer
+=======
+#$WUServer = (Get-ItemProperty "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" -Name WUServer -ErrorAction Ignore).WUServer
+>>>>>>> Stashed changes
 # Look for pending reboots in the registry
 $testPendingRebootRegistry = Test-PendingRebootRegistry
 
+<<<<<<< Updated upstream
 if ($windowsBuild -ge $1809Build) {
     Write-Log -Message "Running correct Windows 10 build number for installing RSAT with Features on Demand. Build number is: $WindowsBuild"
     Write-Log -Message "***********************************************************"
 
     if ($wuServer -ne $null) {
         Write-Log -Message "A local WSUS server was found configured by group policy: $wuServer"
+=======
+#Adding in script to re-route Windows update to Internet and not WSUS.
+Get-Service -Name wuauserv | Stop-Service
+Set-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU\ -Name "UseWUServer" -Value "0"
+Get-Service -Name wuauserv | Start-Service
+
+if (($WindowsBuild -eq $1809Build) -OR ($WindowsBuild -eq $1903Build) -OR ($WindowsBuild -eq $1909Build) -OR ($WindowsBuild -eq $2004Build) -OR ($WindowsBuild -eq $20H2Build)) {
+    Write-Log -Message "Running correct Windows 10 build number for installing RSAT with Features on Demand. Build number is: $WindowsBuild"
+    Write-Log -Message "***********************************************************"
+<#
+    if ($WUServer -ne $null) {
+        Write-Log -Message "A local WSUS server was found configured by group policy: $WUServer"
+>>>>>>> Stashed changes
         Write-Log -Message "You might need to configure additional setting by GPO if things are not working"
         Write-Log -Message "The GPO of interest is following: Specify settings for optional component installation and component repair"
         Write-Log -Message "Check ON: Download repair content and optional features directly from Windows Update..."
@@ -177,8 +195,14 @@ if ($windowsBuild -ge $1809Build) {
             }
         }
     }
+<<<<<<< Updated upstream
 
     if ($testPendingRebootRegistry -eq $true) {
+=======
+#>
+    if ($TestPendingRebootRegistry -eq $true) {
+        Write-Log -Message "Reboots are pending. The script will continue, but RSAT might not install successfully"
+>>>>>>> Stashed changes
         Write-Log -Message "***********************************************************"
         Write-Log -Message "Reboots are pending. The script will continue, but RSAT might not install successfully"
     }
